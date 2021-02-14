@@ -8,22 +8,13 @@ API_KEY = config("YOUTUBE_API_KEY")
 
 youtube = build(serviceName='youtube', version='v3', developerKey=API_KEY)
 
-channel_request = youtube.channels().list(
-    part='statistics',
-    id='UCCezIgC97PvUuR4_gbFUs5g'
-)
 
-comments_request = youtube.commentThreads().list(
-    part='snippet',
-    videoId='YYXdXT2l-Gg'
-)
-
-
-def make_commentThreads_request(part: str, video_id: str) -> None:
+def fetch_commentThreads(video_id: str, num_results: int) -> None:
     request = youtube.commentThreads().list(
-        part=part,
+        part='snippet',
         videoId=video_id,
-        maxResults=50
+        maxResults=num_results,
+        order='relevance'
     )
     return request.execute()
 
@@ -43,11 +34,11 @@ def create_comment_date(object: dict) -> dict:
 
 if __name__ == "__main__":
 
-    comments = make_commentThreads_request('snippet', '8oJYud7TV58')
+    comments = fetch_commentThreads('GXZlZCcJAGs', 50)
     items = comments["items"]
 
     comments_list = [create_comment_date(item) for item in items]
-    comments_list.sort(key=lambda x: x["like_count"])
+    # comments_list.sort(key=lambda x: x["like_count"])
 
     with open('comments_dump.txt', 'w') as f:
         for comment in comments_list:
