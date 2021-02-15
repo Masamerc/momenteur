@@ -1,9 +1,17 @@
 import re
+from typing import List
 
-def extract_timestamp(text: str) -> str:
+def extract_timestamp(text: str) -> List[str]:
     pattern = re.compile(r'(?:\d{1,2}:)?\d{2}:\d{2}')
     match = re.findall(pattern, text)
     return match
+
+
+def has_timestamp(text: str) -> re.Match:
+    pattern = re.compile(r'((?:\d{1,2}:)?\d{1,2}:\d{2})')
+    match = re.search(pattern, text)
+    return match
+
 
 def extract_video_id(url: str) -> str:
     pattern = re.compile(r'\?v=([a-zA-Z0-9-]+)')

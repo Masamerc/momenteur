@@ -1,7 +1,7 @@
 # momenteur
 
 ## to-do
-- [ ] get top 100 comments from a video
-- [ ] get timestamps from comments
+- [x] get top 500 comments from a video
+- [x] get timestamps from comments
 - [ ] create timestamp aggregation
 - [ ] return timestamped moments  
