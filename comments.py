@@ -3,6 +3,7 @@
 import sys
 import time
 import json
+import pickle
 
 from googleapiclient.discovery import build
 from decouple import config
@@ -38,14 +39,17 @@ def create_record(object: dict) -> dict:
         }
 
 
-def extract_timestamped_comments(iterable: List[str]) -> List[Tuple[str]]:
+def find_timestamped_comments(iterable: List[str]) -> List[dict]:
     timestamped_comments  = []
 
     for comment in iterable:
         timestamp_match = has_timestamp(comment['comment'])
 
         if timestamp_match:
-            timestamped_comments.append((comment['comment'], timestamp_match.group(1)))
+            timestamped_comments.append(
+                {'comment':comment['comment'],
+                'timestamp':timestamp_match.group(1)}
+                )
 
     return timestamped_comments
 
@@ -69,30 +73,21 @@ def fetch_comments(video_id: str, pages: int, interval: int=1, max_results: int=
 
 if __name__ == "__main__":
 
-    # target_url = sys.argv[1]
-    # video_id = extract_video_id(target_url)
+    target_url = sys.argv[1]
+    video_id = extract_video_id(target_url)
 
     ### getting multiple-page worth of data ###
-    all_items = fetch_comments('yllMFY1Mb08', pages=5, max_results=100)
+    all_items = fetch_comments(video_id, pages=5, max_results=100)
 
+    comments_list = [create_record(item) for item in all_items]
+    timestamed_comments = find_timestamped_comments(comments_list)
 
-    # comments_list = [create_record(item) for item in all_items]
-    # timestamed_comments = extract_timestamped_comments(comments_list)
+    with open('dump.pkl', 'wb') as p:
+        pickle.dump(timestamed_comments, p)
 
 
     # comments_list.sort(key=lambda x: x["like_count"], reverse=True)
 
-    ### sunp to text ###
-    # with open(f'comments_dump_{video_id}.txt', 'w') as f:
-    #     for comment in comments_list:
-    #         f.write(comment["author"])
-    #         f.write('\n')
-    #         f.write(comment['comment'])
-    #         f.write('\n')
-    #         f.write(f"Likes: {comment['like_count']}")
-    #         f.write('\n')
-    #         f.write('-'*50)
-    #         f.write('\n')
 
     ### find timestamps ###
     # all_texts = " ".join([comment['comment'] for comment in comments_list])
