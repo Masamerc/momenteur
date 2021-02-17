@@ -2,8 +2,8 @@
 
 import sys
 import time
+import json
 
-from typing import Tuple
 from googleapiclient.discovery import build
 from decouple import config
 from typing import List, Tuple
@@ -15,15 +15,14 @@ API_KEY = config("YOUTUBE_API_KEY")
 youtube = build(serviceName='youtube', version='v3', developerKey=API_KEY)
 
 
-def fetch_commentThreads(video_id: str, num_results: int, next_page_token=None) -> None:
+def create_request(video_id: str, max_results: int=1) -> None:
     request = youtube.commentThreads().list(
         part='snippet',
         videoId=video_id,
-        maxResults=num_results,
-        order='relevance',
-        pageToken=next_page_token
+        maxResults=max_results,
+        order='relevance'
     )
-    return request.execute()
+    return request
 
 
 def extract_from_snippet(object: dict, element_name: str) -> str:
@@ -51,32 +50,34 @@ def extract_timestamped_comments(iterable: List[str]) -> List[Tuple[str]]:
     return timestamped_comments
 
 
+def fetch_comments(video_id: str, pages: int, interval: int=1, max_results: int=1) -> List[dict]:
+
+    all_items = []
+
+    request = create_request(video_id, max_results)
+
+    for idx in range(pages):
+        res = request.execute()
+        all_items += res['items']
+        
+        request = youtube.commentThreads().list_next(request, res)
+
+        time.sleep(interval)
+
+    return all_items
+
+
 if __name__ == "__main__":
 
-    target_url = sys.argv[1]
-    video_id = extract_video_id(target_url)
-
+    # target_url = sys.argv[1]
+    # video_id = extract_video_id(target_url)
 
     ### getting multiple-page worth of data ###
-    all_items = []
-    next_page_token = ''
-
-    for idx in range(3):
-        print('Getting page', idx+1)
-
-        if next_page_token:
-            comments = fetch_commentThreads(video_id, 10, next_page_token=next_page_token)
-        else:
-            comments = fetch_commentThreads(video_id, 10)
-
-        items = comments["items"]
-        all_items += items
-        next_page_token = comments['nextPageToken']
-        time.sleep(1)
+    all_items = fetch_comments('yllMFY1Mb08', pages=5, max_results=100)
 
 
-    comments_list = [create_record(item) for item in all_items]
-    timestamed_comments = extract_timestamped_comments(comments_list)
+    # comments_list = [create_record(item) for item in all_items]
+    # timestamed_comments = extract_timestamped_comments(comments_list)
 
 
     # comments_list.sort(key=lambda x: x["like_count"], reverse=True)
