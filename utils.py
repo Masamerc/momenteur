@@ -14,11 +14,11 @@ def has_timestamp(text: str) -> re.Match:
 
 
 def extract_video_id(url: str) -> str:
-    pattern = re.compile(r'\?v=([a-zA-Z0-9-]+)')
+    pattern = re.compile(r'(\/|v=)([a-zA-Z0-9-_]{11})(.*)')
     match = re.search(pattern, url)
 
     if match:
-        return match.group(1)
+        return match.group(2)
 
     print('Not a valide youtube url.')
     return
@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     # extract_vide_id
     video_urls = ('https://www.youtube.com/watch?v=NPMn2WCiQSk', 'https://www.youtube.com/watch?v=e-ORhEE9VVg',
-                 'https://www.youtube.com/watch?v=60ItHLz5WEA')
+                 'https://www.youtube.com/watch?v=60ItHLz5WEA', 'https://www.youtube.com/watch?v=hvYLQM_fMMw')
 
     for video_url in video_urls:
         video_id = extract_video_id(video_url)

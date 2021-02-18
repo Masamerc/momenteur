@@ -2,12 +2,14 @@
 
 import sys
 import time
+import json
+import pickle
 
-from typing import Tuple
 from googleapiclient.discovery import build
 from decouple import config
 from typing import List, Tuple
 from utils import extract_timestamp, extract_video_id, has_timestamp
+from collections import defaultdict
 
 
 API_KEY = config("YOUTUBE_API_KEY")
@@ -15,15 +17,14 @@ API_KEY = config("YOUTUBE_API_KEY")
 youtube = build(serviceName='youtube', version='v3', developerKey=API_KEY)
 
 
-def fetch_commentThreads(video_id: str, num_results: int, next_page_token=None) -> None:
+def create_request(video_id: str, max_results: int=1) -> None:
     request = youtube.commentThreads().list(
         part='snippet',
         videoId=video_id,
-        maxResults=num_results,
-        order='relevance',
-        pageToken=next_page_token
+        maxResults=max_results,
+        order='relevance'
     )
-    return request.execute()
+    return request
 
 
 def extract_from_snippet(object: dict, element_name: str) -> str:
@@ -39,16 +40,48 @@ def create_record(object: dict) -> dict:
         }
 
 
-def extract_timestamped_comments(iterable: List[str]) -> List[Tuple[str]]:
+def fetch_comments(video_id: str, pages: int, interval: int=1, max_results: int=1) -> List[dict]:
+
+    all_items = []
+
+    request = create_request(video_id, max_results)
+
+    for idx in range(pages):
+        res = request.execute()
+        all_items += res['items']
+
+        request = youtube.commentThreads().list_next(request, res)
+
+        time.sleep(interval)
+
+    return all_items
+
+
+def find_timestamped_comments(iterable: List[str]) -> List[dict]:
     timestamped_comments  = []
 
     for comment in iterable:
         timestamp_match = has_timestamp(comment['comment'])
 
         if timestamp_match:
-            timestamped_comments.append((comment['comment'], timestamp_match.group(1)))
+            timestamped_comments.append(
+                {'comment':comment['comment'].replace('\n', ' '),
+                'timestamp':timestamp_match.group(1)}
+                )
 
     return timestamped_comments
+
+
+def rank_sort_timestamps(timestamp_comment_pairs: List[dict]) -> List[dict]:
+    count = defaultdict(list)
+
+    for pair in timestamp_comment_pairs:
+        count[pair['timestamp']].append(pair['comment'])
+
+    sorted_keys = sorted(count, key=lambda k: len(count[k]), reverse=True)
+    sorted_count = [{key:count[key]} for key in sorted_keys]
+
+    return sorted_count
 
 
 if __name__ == "__main__":
@@ -56,45 +89,14 @@ if __name__ == "__main__":
     target_url = sys.argv[1]
     video_id = extract_video_id(target_url)
 
-
     ### getting multiple-page worth of data ###
-    all_items = []
-    next_page_token = ''
-
-    for idx in range(3):
-        print('Getting page', idx+1)
-
-        if next_page_token:
-            comments = fetch_commentThreads(video_id, 10, next_page_token=next_page_token)
-        else:
-            comments = fetch_commentThreads(video_id, 10)
-
-        items = comments["items"]
-        all_items += items
-        next_page_token = comments['nextPageToken']
-        time.sleep(1)
-
+    all_items = fetch_comments(video_id, pages=2, max_results=50)
 
     comments_list = [create_record(item) for item in all_items]
-    timestamed_comments = extract_timestamped_comments(comments_list)
+    timestamed_comments = find_timestamped_comments(comments_list)
+    final_ranked_timestamps = rank_sort_timestamps(timestamed_comments)
 
 
-    # comments_list.sort(key=lambda x: x["like_count"], reverse=True)
-
-    ### sunp to text ###
-    # with open(f'comments_dump_{video_id}.txt', 'w') as f:
-    #     for comment in comments_list:
-    #         f.write(comment["author"])
-    #         f.write('\n')
-    #         f.write(comment['comment'])
-    #         f.write('\n')
-    #         f.write(f"Likes: {comment['like_count']}")
-    #         f.write('\n')
-    #         f.write('-'*50)
-    #         f.write('\n')
-
-    ### find timestamps ###
-    # all_texts = " ".join([comment['comment'] for comment in comments_list])
-    # timestamps = extract_timestamp(all_texts)
-    # print(timestamps)
+    # with open('dump_ranked_ts.json', 'w') as f:
+    #     json.dump(final_ranked_timestamps, f)
 
