@@ -8,7 +8,7 @@ import pickle
 from googleapiclient.discovery import build
 from decouple import config
 from typing import List, Tuple
-from utils import extract_timestamp, extract_video_id, has_timestamp
+from utils import extract_timestamp, extract_video_id, has_timestamp, create_timestamped_url
 from collections import defaultdict
 
 
@@ -47,12 +47,16 @@ def fetch_comments(video_id: str, pages: int, interval: int=1, max_results: int=
     request = create_request(video_id, max_results)
 
     for idx in range(pages):
-        res = request.execute()
-        all_items += res['items']
+        try:
+            res = request.execute()
+            all_items += res['items']
 
-        request = youtube.commentThreads().list_next(request, res)
+            request = youtube.commentThreads().list_next(request, res)
 
-        time.sleep(interval)
+            time.sleep(interval)
+        except Exception as e:
+            print('request could not execute.')
+            print(e)    
 
     return all_items
 
@@ -79,24 +83,46 @@ def rank_sort_timestamps(timestamp_comment_pairs: List[dict]) -> List[dict]:
         count[pair['timestamp']].append(pair['comment'])
 
     sorted_keys = sorted(count, key=lambda k: len(count[k]), reverse=True)
-    sorted_count = [{key:count[key]} for key in sorted_keys]
+    sorted_count = [{'timestamp':key, 'comments': count[key]} for key in sorted_keys]
 
     return sorted_count
 
 
+def add_timestamped_url(ranked_sorted_timestamps: List[dict], video_url: str) -> List[dict]:
+    for record in ranked_sorted_timestamps:
+        record['url'] = create_timestamped_url(video_url, record['timestamp'])
+    
+    return ranked_sorted_timestamps
+
+
+#### for development ####
+def load_items() -> List[dict]:
+    with open('sample_data/sample_items.pkl', 'rb') as f:
+        data = pickle.load(f)
+
+    return data
+
+
 if __name__ == "__main__":
 
-    target_url = sys.argv[1]
-    video_id = extract_video_id(target_url)
+    # target_url = sys.argv[1]
+    # video_id = extract_video_id(target_url)
+    
 
     ### getting multiple-page worth of data ###
-    all_items = fetch_comments(video_id, pages=2, max_results=50)
+    # all_items = fetch_comments(video_id, pages=5, max_results=100)
+    
+    #### for development ####
+    all_items = load_items()
+    target_url = 'https://www.youtube.com/watch?v=tFjNH9l6-sQ'
+    video_id = 'tFjNH9l6-sQ'
 
     comments_list = [create_record(item) for item in all_items]
     timestamed_comments = find_timestamped_comments(comments_list)
-    final_ranked_timestamps = rank_sort_timestamps(timestamed_comments)
+    ranked_timestamps = rank_sort_timestamps(timestamed_comments)
+    final_records = add_timestamped_url(ranked_timestamps, target_url)
 
 
-    # with open('dump_ranked_ts.json', 'w') as f:
-    #     json.dump(final_ranked_timestamps, f)
+    with open('sample_data/dump_ranked_ts.json', 'w') as f:
+        json.dump(final_records, f, indent=2)
 
