@@ -1,6 +1,7 @@
 import re
 from typing import List
 
+
 def extract_timestamp(text: str) -> List[str]:
     pattern = re.compile(r'(?:\d{1,2}:)?\d{2}:\d{2}')
     match = re.findall(pattern, text)
@@ -20,8 +21,7 @@ def extract_video_id(url: str) -> str:
     if match:
         return match.group(2)
 
-    print('Not a valide youtube url.')
-    return
+    return 'Not a valid YouTube URL.'
 
 
 def create_timestamped_url(video_url: str, timestamp: str) -> str:
@@ -42,20 +42,4 @@ def create_timestamped_url(video_url: str, timestamp: str) -> str:
     
 
 if __name__ == '__main__':
-
-    # extract_timestamp
-    # with open('comments_dump.txt') as f:
-    #     text = f.read()
-
-    # result = extract_timestamp(text)
-    # print(result)
-
-
-    # extract_vide_id
-    video_urls = ('https://www.youtube.com/watch?v=NPMn2WCiQSk', 'https://www.youtube.com/watch?v=e-ORhEE9VVg',
-                 'https://www.youtube.com/watch?v=60ItHLz5WEA', 'https://www.youtube.com/watch?v=hvYLQM_fMMw')
-
-    for video_url in video_urls:
-        video_id = extract_video_id(video_url)
-        print(video_id)
-
+    pass
