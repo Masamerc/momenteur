@@ -7,4 +7,5 @@
 - [x] return timestamped moments
 - [x] make code modular
 - [x] create API
-- [ ] store data in MongoDB 
+- [x] store data in MongoDB 
+- [ ] clean code
