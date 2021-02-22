@@ -13,12 +13,11 @@ from collections import defaultdict
 
 try:
     API_KEY = config("YOUTUBE_API_KEY")
+    youtube = build(serviceName='youtube', version='v3', developerKey=API_KEY)
+
 except Exception as e:
     print(e)
     pass
-
-
-youtube = build(serviceName='youtube', version='v3', developerKey=API_KEY)
 
 
 class Momenteur(object):
