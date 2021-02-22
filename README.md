@@ -1,4 +1,5 @@
 # momenteur
+![status](https://circleci.com/gh/Masamerc/momenteur.svg?style=shield)
 
 ## to-do
 - [x] get top 500 comments from a video
