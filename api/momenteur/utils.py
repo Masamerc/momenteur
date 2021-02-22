@@ -2,7 +2,7 @@ import re
 from typing import List
 
 
-def has_timestamp(text: str) re.Match:
+def has_timestamp(text: str):
     pattern = re.compile(r'((?:\d{1,2}:)?\d{1,2}:\d{2})')
     match = re.search(pattern, text)
     return match
