@@ -11,13 +11,9 @@ from typing import List
 from .utils import extract_video_id, has_timestamp, create_timestamped_url
 from collections import defaultdict
 
-try:
-    API_KEY = config("YOUTUBE_API_KEY")
-    youtube = build(serviceName='youtube', version='v3', developerKey=API_KEY)
 
-except Exception as e:
-    print(e)
-    pass
+API_KEY = config("YOUTUBE_API_KEY")
+youtube = build(serviceName='youtube', version='v3', developerKey=API_KEY)
 
 
 class Momenteur(object):
