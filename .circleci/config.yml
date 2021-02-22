@@ -6,6 +6,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: create .env file
+          command: |
+            touch .env
+            echo YOUTUBE_API_KEY=$YOUTUBE_API_KEY >> .env
+      - run:
           name: install dependencies
           command: |
             python3 -m venv venv
