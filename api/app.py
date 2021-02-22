@@ -3,7 +3,7 @@ import uuid
 from decouple import config
 from datetime import datetime
 from fastapi import FastAPI
-from momenteur.comments import Momenteur
+from momenteur.main import Momenteur
 from pymongo import MongoClient, collection
 from typing import List
 

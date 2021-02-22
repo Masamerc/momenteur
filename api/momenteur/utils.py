@@ -2,12 +2,6 @@ import re
 from typing import List
 
 
-def extract_timestamp(text: str) -> List[str]:
-    pattern = re.compile(r'(?:\d{1,2}:)?\d{2}:\d{2}')
-    match = re.findall(pattern, text)
-    return match
-
-
 def has_timestamp(text: str) -> re.Match:
     pattern = re.compile(r'((?:\d{1,2}:)?\d{1,2}:\d{2})')
     match = re.search(pattern, text)
@@ -39,7 +33,3 @@ def create_timestamped_url(video_url: str, timestamp: str) -> str:
         return timestamped_url
  
     return 'timestamp could not be converted to URL'
-    
-
-if __name__ == '__main__':
-    pass

@@ -1,8 +1,8 @@
 #!/usr/env/bin/python3
 
-import sys
 import time
 import json
+import os
 import pickle
 
 from googleapiclient.discovery import build
@@ -33,7 +33,6 @@ class Momenteur(object):
             order='relevance'
         )
         return request
-
 
     
     def _extract_from_snippet(self, object: dict, element_name: str) -> str:
@@ -70,7 +69,6 @@ class Momenteur(object):
 
         return all_items
     
-
 
     def find_timestamped_comments(self, all_items: List[dict]) -> List[dict]:
 
@@ -110,8 +108,8 @@ class Momenteur(object):
 
 
     #### for development ####
-    def load_items(self) -> List[dict]:
-        with open('sample_data/sample_items.pkl', 'rb') as f:
+    def _load_items(self, path=os.path.join(os.getcwd(), 'sample_data/sample_items.pkl')) -> List[dict]:
+        with open(path, 'rb') as f:
             data = pickle.load(f)
 
         return data
@@ -119,35 +117,10 @@ class Momenteur(object):
 
 if __name__ == "__main__":
 
-    # target_url = sys.argv[1]
-    # video_id = extract_video_id(target_url)
-    
-
-    ### getting multiple-page worth of data ###
-    # all_items = fetch_comments(video_id, pages=5, max_results=100)
-    
-
     m = Momenteur('https://www.youtube.com/watch?v=tFjNH9l6-sQ')
 
     # res_items = m.fetch_comments(pages=5, max_results=100)
-    res_items = m.load_items()
+    res_items = m._load_items()
     timestamped_comments = m.find_timestamped_comments(res_items)
     ranked_timestamped_comments = m.rank_sort_timestamps(timestamped_comments)
     final_records = m.add_timestamped_url(ranked_timestamped_comments)
-
-
-
-    # #### for development ####
-    # all_items = load_items()
-    # target_url = 'https://www.youtube.com/watch?v=tFjNH9l6-sQ'
-    # video_id = 'tFjNH9l6-sQ'
-
-    # comments_list = [create_record(item) for item in all_items]
-    # timestamed_comments = find_timestamped_comments(comments_list)
-    # ranked_timestamps = rank_sort_timestamps(timestamed_comments)
-    # final_records = add_timestamped_url(ranked_timestamps, target_url)
-
-
-    # with open('sample_data/dump_ranked_ts.json', 'w') as f:
-    #     json.dump(final_records, f, indent=2)
-
