@@ -1,0 +1,7 @@
+pymongo
+dnspython
+google-api-python-client
+uvicorn
+fastapi
+pytest
+python-decouple

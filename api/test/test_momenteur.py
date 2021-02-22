@@ -9,7 +9,7 @@ m = Momenteur('https://www.youtube.com/watch?v=tFjNH9l6-sQ')
 
 @fixture
 def response_items():
-    return m._load_items(os.path.join(os.getcwd(), 'momenteur/sample_data/sample_items.pkl'))
+    return m._load_items(os.path.join(os.getcwd(), 'api/momenteur/sample_data/sample_items.pkl'))
 
 
 @fixture
