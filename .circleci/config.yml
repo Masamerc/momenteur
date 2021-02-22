@@ -10,9 +10,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install pytest
-            pip install pytest-cov
-            pip install -e ./.
+            pip install -r requirements.txt
       - run:
           name: run test
           command: |
@@ -20,8 +18,3 @@ jobs:
             pytest --junitxml=test-reports/junit.xml
       - store-test-results:
           path: test-reports
-      - run:
-          name: run test-cov
-          command: |
-            . venv/bin/activate
-            pytest --cov=src
