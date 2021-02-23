@@ -5,3 +5,4 @@ uvicorn
 fastapi
 pytest
 python-decouple
+gunicorn

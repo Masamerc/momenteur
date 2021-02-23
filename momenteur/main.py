@@ -101,7 +101,7 @@ class Momenteur(object):
     def add_timestamped_url(self, ranked_sorted_timestamps: List[dict]) -> List[dict]:
         for record in ranked_sorted_timestamps:
             record['url'] = create_timestamped_url(self.video_url, record['timestamp'])
-        
+            record['video_id'] = self.video_id
         return ranked_sorted_timestamps
 
 

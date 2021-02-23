@@ -6,8 +6,24 @@ from fastapi import FastAPI
 from momenteur.main import Momenteur
 from pymongo import MongoClient, collection
 from typing import List
+from pydantic import BaseModel
 
 app = FastAPI()
+
+
+class UrlInput(BaseModel):
+    video_url: str
+
+
+class TimeStampRecord(BaseModel):
+    timestamp: str
+    comments: List[str]
+    comment_count: int
+    url: str
+    video_id: str
+    _id: str
+    created_at: datetime
+
 
 def load_to_mongo(documents: List[dict]) -> None:
     client = MongoClient(config('MONGO_URI'))
@@ -25,9 +41,9 @@ def root():
     return {"message": "ok"}
 
 
-@app.get('/videos')
-def get_timestamps(video_url: str) -> List[dict]:
-    m = Momenteur(video_url)
+@app.post('/videos', response_model=List[TimeStampRecord], status_code=200)
+def get_timestamps(payload: UrlInput) -> List[dict]:
+    m = Momenteur(payload.video_url)
 
     res_items = m.fetch_comments(pages=10, max_results=100)
     timestamped_comments = m.find_timestamped_comments(res_items)
@@ -37,3 +53,4 @@ def get_timestamps(video_url: str) -> List[dict]:
     load_to_mongo(final_records)
 
     return final_records
+
