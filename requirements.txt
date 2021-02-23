@@ -1,8 +1,8 @@
 pymongo
 dnspython
 google-api-python-client
-uvicorn=20.0.4
+uvicorn==20.0.4
 fastapi
 pytest
 python-decouple
-gunicorn=0.11.2
+gunicorn==0.11.2
