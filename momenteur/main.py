@@ -46,7 +46,7 @@ class Momenteur(object):
             }
         
 
-    def fetch_comments(self, pages: int=1, interval: int=1, max_results: int=1) -> List[dict]:
+    def fetch_comments(self, pages: int=1, interval: int=0.1, max_results: int=1) -> List[dict]:
 
         all_items = []
 

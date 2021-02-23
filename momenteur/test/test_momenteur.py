@@ -1,7 +1,7 @@
 import os
 
-from ..momenteur.utils import extract_video_id, create_timestamped_url
-from ..momenteur.main import Momenteur
+from ..utils import extract_video_id, create_timestamped_url
+from ..main import Momenteur
 from pytest import fixture
 
 m = Momenteur('https://www.youtube.com/watch?v=tFjNH9l6-sQ')
@@ -9,7 +9,7 @@ m = Momenteur('https://www.youtube.com/watch?v=tFjNH9l6-sQ')
 
 @fixture
 def response_items():
-    return m._load_items(os.path.join(os.getcwd(), 'api/momenteur/sample_data/sample_items.pkl'))
+    return m._load_items(os.path.join(os.getcwd(), 'momenteur/sample_data/sample_items.pkl'))
 
 
 @fixture
