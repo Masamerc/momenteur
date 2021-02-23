@@ -6,3 +6,5 @@ fastapi
 pytest
 python-decouple
 gunicorn
+uviloop
+httptools
