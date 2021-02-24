@@ -106,7 +106,7 @@ class Momenteur(object):
 
 
     #### for development ####
-    def _load_items(self, path=os.path.join(os.getcwd(), 'sample_data/sample_items.pkl')) -> List[dict]:
+    def _load_items(self, path=os.path.join(os.getcwd(), 'momenteur/sample_data/sample_items.pkl')) -> List[dict]:
         with open(path, 'rb') as f:
             data = pickle.load(f)
 
