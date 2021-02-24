@@ -1,12 +1,11 @@
 #!/usr/env/bin/python3
 
-import time
 import os
 import pickle
 
 from googleapiclient.discovery import build
 from decouple import config
-from typing import List, final
+from typing import List
 from .utils import extract_video_id, has_timestamp, create_timestamped_url, convert_yt_duration_to_seconds
 from collections import defaultdict
 
@@ -116,7 +115,7 @@ class Momenteur(object):
         return ranked_sorted_timestamps
 
 
-    #### for development ####
+    ### for development ####
     def _load_items(self, path=os.path.join(os.getcwd(), 'momenteur/sample_data/sample_items.pkl')) -> List[dict]:
         with open(path, 'rb') as f:
             data = pickle.load(f)
@@ -126,7 +125,7 @@ class Momenteur(object):
 
 if __name__ == "__main__":
 
-    m = Momenteur('https://www.youtube.com/watch?v=X7bRArcElC8')
+    m = Momenteur('https://www.youtube.com/watch?v=tFjNH9l6-sQ')
 
     # res_items = m.fetch_comments(pages=5, max_results=100)
     res_items = m._load_items()

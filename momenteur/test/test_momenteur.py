@@ -1,6 +1,6 @@
 import os
 
-from ..utils import extract_video_id, create_timestamped_url
+from ..utils import extract_video_id, create_timestamped_url, convert_yt_duration_to_seconds
 from ..main import Momenteur
 from pytest import fixture
 
@@ -70,3 +70,13 @@ def test_add_timestamped_url(response_items):
     for result in results:
         expected = create_timestamped_url(m.video_url, result['timestamp'])
         assert result['url'] == expected, f"Failed: {result['url']} != {expected}"
+
+
+def test_convert_yt_duration_to_seconds():
+    yt_durations = ['PT3M45S', 'PT1H12M33S', 'PT56S']
+    
+    expected = [(3*60)+45, (1*3600)+(12*60)+33, 56]
+    results = [convert_yt_duration_to_seconds(yt_duration) for yt_duration in yt_durations]
+
+    for expected_result, actual_result in zip(expected, results):
+        assert expected_result == actual_result, f"Failed: {expected_result} != {actual_result}"
