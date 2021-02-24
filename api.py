@@ -10,7 +10,6 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-
 class UrlInput(BaseModel):
     video_url: str
 
@@ -54,3 +53,13 @@ def get_timestamps(payload: UrlInput) -> List[dict]:
 
     return final_records
 
+
+@app.get('/testing/videos', status_code=200)
+def get_timestamps_for_dev() -> List[dict]:
+    m = Momenteur('https://www.youtube.com/watch?v=tFjNH9l6-sQ')
+    res_items = m._load_items()
+    timestamped_comments = m.find_timestamped_comments(res_items)
+    ranked_timestamped_comments = m.rank_sort_timestamps(timestamped_comments)
+    final_records = m.add_timestamped_url(ranked_timestamped_comments)
+
+    return final_records
