@@ -33,3 +33,20 @@ def create_timestamped_url(video_url: str, timestamp: str) -> str:
         return timestamped_url
  
     return 'timestamp could not be converted to URL'
+
+
+def convert_yt_duration_to_seconds(yt_duration: str) -> str:
+    pattern = re.compile(r'(?:(\d{1,2})H)?(?:(\d{1,2})M)?(\d{1,2})S')
+    match = re.search(pattern, yt_duration)
+
+    hours = match.group(1) if match.group(1) else 0
+    minutes = match.group(2) if match.group(2) else 0
+    seconds = match.group(3) if match.group(3) else 0
+
+    total_seconds = int(seconds) + (int(minutes) * 60) + (int(hours) * 3600)
+
+    return total_seconds
+
+
+if __name__ == '__main__':
+    pass

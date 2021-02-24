@@ -8,7 +8,7 @@ import pickle
 from googleapiclient.discovery import build
 from decouple import config
 from typing import List
-from .utils import extract_video_id, has_timestamp, create_timestamped_url
+from .utils import extract_video_id, has_timestamp, create_timestamped_url, convert_yt_duration_to_seconds
 from collections import defaultdict
 
 
@@ -21,6 +21,7 @@ class Momenteur(object):
     def __init__(self, video_url:str):
         self.video_url = video_url
         self.video_id = extract_video_id(self.video_url)
+        self.video_length = self._get_video_length()
     
 
     def _create_request(self, max_results: int=1) -> None:
@@ -32,7 +33,19 @@ class Momenteur(object):
         )
         return request
 
-    
+
+    def _get_video_length(self):
+        request = youtube.videos().list(
+            part='contentDetails',
+            id=self.video_id
+        )
+        response = request.execute()
+        video_length = response['items'][0]['contentDetails']['duration']
+        video_length = convert_yt_duration_to_seconds(video_length)
+
+        return video_length
+
+
     def _extract_from_snippet(self, object: dict, element_name: str) -> str:
         return object["snippet"]["topLevelComment"]["snippet"][element_name]
 
@@ -102,6 +115,7 @@ class Momenteur(object):
         for record in ranked_sorted_timestamps:
             record['url'] = create_timestamped_url(self.video_url, record['timestamp'])
             record['video_id'] = self.video_id
+            record['duration_s'] = self.video_length
         return ranked_sorted_timestamps
 
 
@@ -115,10 +129,10 @@ class Momenteur(object):
 
 if __name__ == "__main__":
 
-    m = Momenteur('https://www.youtube.com/watch?v=tFjNH9l6-sQ')
+    m = Momenteur('https://www.youtube.com/watch?v=X7bRArcElC8')
 
     # res_items = m.fetch_comments(pages=5, max_results=100)
-    res_items = m._load_items()
-    timestamped_comments = m.find_timestamped_comments(res_items)
-    ranked_timestamped_comments = m.rank_sort_timestamps(timestamped_comments)
-    final_records = m.add_timestamped_url(ranked_timestamped_comments)
+    # res_items = m._load_items()
+    # timestamped_comments = m.find_timestamped_comments(res_items)
+    # ranked_timestamped_comments = m.rank_sort_timestamps(timestamped_comments)
+    # final_records = m.add_timestamped_url(ranked_timestamped_comments)
