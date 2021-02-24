@@ -29,6 +29,7 @@ class TimeStampRecord(BaseModel):
     comment_count: int
     url: str
     video_id: str
+    duration_s: int
     _id: str
     created_at: datetime
 
