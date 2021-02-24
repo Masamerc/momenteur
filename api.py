@@ -3,12 +3,21 @@ import uuid
 from decouple import config
 from datetime import datetime
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from momenteur.main import Momenteur
 from pymongo import MongoClient, collection
 from typing import List
 from pydantic import BaseModel
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class UrlInput(BaseModel):
     video_url: str
