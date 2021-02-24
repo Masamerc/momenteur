@@ -1,13 +1,12 @@
 #!/usr/env/bin/python3
 
 import time
-import json
 import os
 import pickle
 
 from googleapiclient.discovery import build
 from decouple import config
-from typing import List
+from typing import List, final
 from .utils import extract_video_id, has_timestamp, create_timestamped_url, convert_yt_duration_to_seconds
 from collections import defaultdict
 
@@ -59,7 +58,7 @@ class Momenteur(object):
             }
         
 
-    def fetch_comments(self, pages: int=1, interval: int=0.1, max_results: int=1) -> List[dict]:
+    def fetch_comments(self, pages: int=1, max_results: int=1) -> List[dict]:
 
         all_items = []
 
@@ -71,8 +70,6 @@ class Momenteur(object):
                 all_items += res['items']
 
                 request = youtube.commentThreads().list_next(request, res)
-
-                time.sleep(interval)
 
             except Exception as e:
                 print('request could not execute.')
@@ -132,7 +129,7 @@ if __name__ == "__main__":
     m = Momenteur('https://www.youtube.com/watch?v=X7bRArcElC8')
 
     # res_items = m.fetch_comments(pages=5, max_results=100)
-    # res_items = m._load_items()
-    # timestamped_comments = m.find_timestamped_comments(res_items)
-    # ranked_timestamped_comments = m.rank_sort_timestamps(timestamped_comments)
-    # final_records = m.add_timestamped_url(ranked_timestamped_comments)
+    res_items = m._load_items()
+    timestamped_comments = m.find_timestamped_comments(res_items)
+    ranked_timestamped_comments = m.rank_sort_timestamps(timestamped_comments)
+    final_records = m.add_timestamped_url(ranked_timestamped_comments)

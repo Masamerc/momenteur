@@ -60,7 +60,7 @@ def get_timestamps(payload: UrlInput) -> List[dict]:
     final_records = m.add_timestamped_url(ranked_timestamped_comments)
 
     load_to_mongo(final_records)
-
+    
     return final_records
 
 
