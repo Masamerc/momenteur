@@ -7,7 +7,7 @@ logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 fh = logging.FileHandler('momenteur.log')
-fh = setLevel(logging.DEBUG)
+fh.setLevel(logging.DEBUG)
 
 f = logging.Formatter('%(asctime)s - %(name)s - [%(levelname)s] - %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 ch.setFormatter(f)
@@ -15,4 +15,3 @@ fh.setFormatter(f)
 
 logger.addHandler(ch)
 logger.addHandler(fh)
-
